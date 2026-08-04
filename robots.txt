@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://raisedbyvolcanoes.com/sitemap.xml
+Sitemap: https://www.raisedbyvolcanoes.com/sitemap.xml
