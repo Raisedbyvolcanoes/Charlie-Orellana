@@ -526,6 +526,15 @@ a {
   filter: grayscale(0.1);
 }
 
+.gallery-item img,
+.photo-grid-item img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+}
+
 .gallery-progress {
   position: relative;
   height: 2px;
@@ -941,6 +950,11 @@ a {
   width: auto;
   height: auto;
   object-fit: contain;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
 }
 
 .photo-lightbox-close,

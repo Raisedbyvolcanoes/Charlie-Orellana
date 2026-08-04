@@ -479,3 +479,23 @@ if (newsletterPopup) {
     });
   }
 }
+
+// ---------------------------------------------------
+// Discourage right-click-save / drag-save on photos
+// (gallery, portfolio grid, and the photo lightbox)
+// ---------------------------------------------------
+
+const protectedImageSelector =
+  ".gallery-item img, .photo-grid-item img, .photo-lightbox-img";
+
+document.addEventListener("contextmenu", (e) => {
+  if (e.target.closest(protectedImageSelector)) {
+    e.preventDefault();
+  }
+});
+
+document.addEventListener("dragstart", (e) => {
+  if (e.target.closest(protectedImageSelector)) {
+    e.preventDefault();
+  }
+});
