@@ -1,0 +1,20 @@
+{
+  "name": "charlie-orellana",
+  "version": "1.0.0",
+  "description": "Raised by Volcanoes — Portfolio website for filmmaker and photographer Charlie Orellana",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build needed'"
+  },
+  "keywords": [
+    "portfolio",
+    "photography",
+    "filmmaker"
+  ],
+  "author": "Charlie Orellana",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
