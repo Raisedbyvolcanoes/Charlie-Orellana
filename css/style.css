@@ -1256,7 +1256,8 @@ a {
   min-width: 0;
 }
 
-.contact-form-wrap h1 {
+.contact-form-wrap h1,
+.contact-form-wrap h2 {
   font-family: var(--serif);
   font-weight: 400;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
@@ -1375,6 +1376,7 @@ a {
 }
 
 .section-alt .contact-form-wrap h1,
+.section-alt .contact-form-wrap h2,
 .section-alt .contact-intro,
 .section-alt .contact-form label {
   color: var(--bg);
@@ -1570,7 +1572,8 @@ a {
     align-self: center;
   }
 
-  .contact-form-wrap h1 {
+  .contact-form-wrap h1,
+  .contact-form-wrap h2 {
     text-align: center;
   }
 
