@@ -1389,6 +1389,22 @@ a {
   color: var(--bg);
 }
 
+.form-status {
+  margin: 0.75rem 0 0;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  min-height: 1.2em;
+}
+
+.form-status-success {
+  color: #6fbf73;
+}
+
+.form-status-error {
+  color: #e07a6c;
+}
+
 .section-alt .contact-form-wrap h1,
 .section-alt .contact-form-wrap h2,
 .section-alt .contact-intro,

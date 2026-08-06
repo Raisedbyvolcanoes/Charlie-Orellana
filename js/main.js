@@ -481,6 +481,55 @@ if (newsletterPopup) {
 }
 
 // ---------------------------------------------------
+// Contact forms: submit via Web3Forms (AJAX, no reload)
+// ---------------------------------------------------
+
+document.querySelectorAll(".contact-form").forEach((form) => {
+  const statusEl = form.querySelector(".form-status");
+  const submitBtn = form.querySelector(".contact-submit");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+    if (statusEl) {
+      statusEl.textContent = "";
+      statusEl.className = "form-status";
+    }
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: { Accept: "application/json" },
+        body: new FormData(form),
+      });
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.message || "Submission failed");
+      }
+
+      form.reset();
+      if (statusEl) {
+        statusEl.textContent =
+          "Thanks — your message has been sent. I'll get back to you soon.";
+        statusEl.className = "form-status form-status-success";
+      }
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent =
+          "Something went wrong sending your message. Please try again or email directly.";
+        statusEl.className = "form-status form-status-error";
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send Inquiry";
+    }
+  });
+});
+
+// ---------------------------------------------------
 // Discourage right-click-save / drag-save on photos
 // (gallery, portfolio grid, and the photo lightbox)
 // ---------------------------------------------------

@@ -74,6 +74,9 @@
         and I&rsquo;ll get back to you personally.
       </p>
       <form class="contact-form" name="contact-page" method="POST">
+        <input type="hidden" name="access_key" value="cbae8a51-a42c-4585-a53d-71b33facf0b2" />
+        <input type="hidden" name="subject" value="New inquiry from Raised by Volcanoes (Contact page)" />
+        <input type="checkbox" name="botcheck" class="botcheck" style="display: none" tabindex="-1" autocomplete="off" />
         <div class="form-row">
           <label for="name">Name</label>
           <input type="text" id="name" name="name" required />
@@ -98,6 +101,7 @@
           <textarea id="description" name="description" rows="3" required></textarea>
         </div>
         <button type="submit" class="contact-submit">Send Inquiry</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
   </section>
