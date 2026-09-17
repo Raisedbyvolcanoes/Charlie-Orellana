@@ -746,6 +746,27 @@ a {
   gap: 1.5rem;
 }
 
+.video-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.video-tile-caption {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .video-tile-caption {
+    display: block;
+    padding: 0 0 0.7rem;
+    color: var(--fg);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    text-align: center;
+  }
+}
+
 .video-tile {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -912,13 +933,6 @@ a {
   letter-spacing: 0.02em;
   text-align: center;
   padding-bottom: 0.9rem;
-}
-
-@media (max-width: 860px) {
-  .video-lightbox-title:not(:empty) {
-    display: block;
-    padding-bottom: 2rem;
-  }
 }
 
 .photo-grid-item img {
