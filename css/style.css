@@ -693,6 +693,12 @@ a {
     height: 40vh;
     min-height: 260px;
   }
+  .portfolio-hero + .videography {
+    padding-top: 2.25rem;
+  }
+  .portfolio-hero + .videography h2 {
+    margin-bottom: 1.75rem;
+  }
 }
 
 .portfolio-hero-img {
