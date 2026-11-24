@@ -688,6 +688,13 @@ a {
   justify-content: center;
 }
 
+@media (max-width: 860px) {
+  .portfolio-hero {
+    height: 40vh;
+    min-height: 260px;
+  }
+}
+
 .portfolio-hero-img {
   position: absolute;
   inset: 0;
