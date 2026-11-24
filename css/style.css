@@ -2155,8 +2155,6 @@ html.subscribe-lock {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
-  object-fit: cover;
   transition: transform 0.8s ease;
 }
 
