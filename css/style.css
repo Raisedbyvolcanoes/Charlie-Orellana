@@ -2125,3 +2125,10 @@ html.subscribe-lock {
 .footer-email:hover {
   color: var(--fg);
 }
+
+@media (max-width: 600px) {
+  .footer-center {
+    order: 3;
+    flex: 1 1 100%;
+  }
+}
