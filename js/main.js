@@ -652,3 +652,18 @@ filterButtons.forEach((btn) => {
     });
   });
 });
+
+// Portfolio: open a category straight from a link like /portfolio#music
+(function () {
+  const target = location.hash.replace("#", "");
+  if (!target) return;
+  const btn = document.querySelector(`.video-filter[data-filter="${target}"]`);
+  if (!btn) return;
+  btn.click();
+  const section = document.querySelector(".videography");
+  if (section) {
+    setTimeout(() => {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  }
+})();

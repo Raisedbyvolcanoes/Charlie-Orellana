@@ -2081,3 +2081,12 @@ html.subscribe-lock {
     border-radius: 50%;
   }
 }
+
+/* Featured film credit under each homepage video */
+.video-feature .video-feature-credit {
+  margin-top: 1rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+}
