@@ -2091,14 +2091,14 @@ html.subscribe-lock {
   color: var(--fg-muted);
 }
 
-/* Homepage intro: a single editorial statement under the hero */
+/* Homepage intro: a single short statement under the hero */
 .intro-statement {
-  max-width: 46ch;
+  max-width: 980px;
   margin: 0 auto;
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(1.35rem, 2.3vw, 1.95rem);
-  line-height: 1.5;
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 1.05rem;
+  line-height: 1.8;
   color: var(--fg);
-  text-wrap: pretty;
+  text-wrap: balance;
 }
