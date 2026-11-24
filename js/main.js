@@ -388,6 +388,81 @@ if (galleryScroll && galleryProgress && galleryProgressBar) {
   galleryProgress.addEventListener("pointercancel", endGalleryDrag);
 }
 
+// Click-and-drag the photo strip itself with a mouse (touch already swipes)
+if (galleryScroll) {
+  let dragging = false;
+  let moved = false;
+  let startX = 0;
+  let startScroll = 0;
+  let lastX = 0;
+  let lastT = 0;
+  let velocity = 0;
+  let glide;
+
+  galleryScroll.classList.add("is-draggable");
+
+  galleryScroll.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    cancelAnimationFrame(glide);
+    dragging = true;
+    moved = false;
+    startX = lastX = e.clientX;
+    lastT = performance.now();
+    velocity = 0;
+    startScroll = galleryScroll.scrollLeft;
+    galleryScroll.setPointerCapture(e.pointerId);
+    galleryScroll.classList.add("is-grabbing");
+  });
+
+  galleryScroll.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 4) moved = true;
+    galleryScroll.scrollLeft = startScroll - dx;
+    const now = performance.now();
+    const dt = now - lastT;
+    if (dt > 0) velocity = (e.clientX - lastX) / dt;
+    lastX = e.clientX;
+    lastT = now;
+  });
+
+  const endDrag = (e) => {
+    if (!dragging) return;
+    dragging = false;
+    if (galleryScroll.hasPointerCapture(e.pointerId)) {
+      galleryScroll.releasePointerCapture(e.pointerId);
+    }
+    // A little momentum so the strip glides after letting go
+    let v = velocity * 16;
+    const step = () => {
+      if (Math.abs(v) < 0.5) {
+        galleryScroll.classList.remove("is-grabbing");
+        return;
+      }
+      galleryScroll.scrollLeft -= v;
+      v *= 0.92;
+      glide = requestAnimationFrame(step);
+    };
+    step();
+  };
+
+  galleryScroll.addEventListener("pointerup", endDrag);
+  galleryScroll.addEventListener("pointercancel", endDrag);
+
+  // Don't treat the end of a drag as a click on a photo
+  galleryScroll.addEventListener(
+    "click",
+    (e) => {
+      if (moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = false;
+      }
+    },
+    true
+  );
+}
+
 // ---------------------------------------------------
 // Scroll reveal
 // ---------------------------------------------------
@@ -511,31 +586,69 @@ if (newsletterForm) {
   });
 }
 
-// Welcome popup on every other page, once per visitor
-// Skip the contact page so it never gets between a client and an inquiry
+// ---------------------------------------------------
+// Welcome popup, once per visitor (never on the contact page).
+//
+// POPUP_MODE picks what the popup shows:
+//   "prints"     -> The Print Collection (current)
+//   "newsletter" -> the newsletter signup card
+// Change the word below to switch back at any time.
+// ---------------------------------------------------
+
+const POPUP_MODE = "prints";
+
+const SHOP_URL = "https://www.raisedbyvolcanoes.shop";
+const PRINTS_SEEN_KEY = "rbv-prints-popup-seen";
+
+function buildPrintsCard({ headingId }) {
+  const card = document.createElement("div");
+  card.className = "subscribe-card subscribe-card--prints";
+  card.innerHTML = `
+    <button type="button" class="subscribe-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <a class="subscribe-photo" href="${SHOP_URL}" aria-label="Explore The Print Collection">
+      <img src="print-ancestry-framed.jpg" alt="Ancestry, framed fine art print by Charlie Orellana" width="1400" height="1811" />
+    </a>
+    <div class="subscribe-content">
+      <img class="subscribe-logo" src="Raised%20By%20Volcanoes%20logo_white%20-%20Copy.png" alt="Raised by Volcanoes" width="1530" height="510" />
+      <span class="prints-label">Now available</span>
+      <h2 class="subscribe-heading" id="${headingId}">The Print Collection</h2>
+      <p class="prints-collection">&ldquo;Raised by Volcanoes&rdquo;</p>
+      <p class="subscribe-sub">This collection represents the connection to the natural world and the Indigenous practices of the people of Guatemala.</p>
+      <a class="subscribe-submit prints-popup-cta" href="${SHOP_URL}">Explore the collection</a>
+    </div>`;
+  return card;
+}
+
 const isContactPage =
   /^\/contact(\.html)?\/?$/.test(location.pathname) ||
   !!document.querySelector(".contact-page");
 
-if (!subscribePage && !isContactPage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
+const popupSeenKey = POPUP_MODE === "prints" ? PRINTS_SEEN_KEY : SUBSCRIBE_SEEN_KEY;
+
+if (!subscribePage && !isContactPage && !storage.get(popupSeenKey)) {
   const popup = document.createElement("div");
   popup.className = "subscribe-popup";
   popup.setAttribute("role", "dialog");
   popup.setAttribute("aria-modal", "true");
-  popup.setAttribute("aria-labelledby", "subscribe-popup-heading");
+  popup.setAttribute("aria-labelledby", "site-popup-heading");
 
   const backdrop = document.createElement("div");
   backdrop.className = "subscribe-backdrop";
   popup.appendChild(backdrop);
 
-  const card = buildSubscribeCard({ closable: true, headingId: "subscribe-popup-heading" });
+  const card =
+    POPUP_MODE === "prints"
+      ? buildPrintsCard({ headingId: "site-popup-heading" })
+      : buildSubscribeCard({ closable: true, headingId: "site-popup-heading" });
   popup.appendChild(card);
   document.body.appendChild(popup);
 
   const closePopup = () => {
     popup.classList.remove("is-open");
     document.documentElement.classList.remove("subscribe-lock");
-    storage.set(SUBSCRIBE_SEEN_KEY, "1");
+    storage.set(popupSeenKey, "1");
     setTimeout(() => popup.remove(), 400);
   };
 
@@ -543,6 +656,10 @@ if (!subscribePage && !isContactPage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
   card.querySelector(".subscribe-close").addEventListener("click", closePopup);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && popup.classList.contains("is-open")) closePopup();
+  });
+  // Visiting the shop from the popup counts as "seen"
+  card.querySelectorAll(`a[href="${SHOP_URL}"]`).forEach((link) => {
+    link.addEventListener("click", () => storage.set(popupSeenKey, "1"));
   });
 
   // Open only once the visitor has engaged with the work:
