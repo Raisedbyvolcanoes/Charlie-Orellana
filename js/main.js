@@ -548,3 +548,22 @@ document.addEventListener("dragstart", (e) => {
     e.preventDefault();
   }
 });
+
+// Portfolio: filter films by category
+const filterButtons = document.querySelectorAll(".video-filter");
+const filterableItems = document.querySelectorAll(".video-item[data-category]");
+
+filterButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const filter = btn.dataset.filter;
+    filterButtons.forEach((b) => {
+      const active = b === btn;
+      b.classList.toggle("is-active", active);
+      b.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+    filterableItems.forEach((item) => {
+      const show = filter === "all" || item.dataset.category === filter;
+      item.classList.toggle("is-hidden", !show);
+    });
+  });
+});
