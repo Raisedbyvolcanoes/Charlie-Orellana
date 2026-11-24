@@ -436,8 +436,9 @@ if (newsletterForm) {
 
 // ---------------------------------------------------
 // Subscribe card: one design used two ways.
-// - As a welcome popup on every page for first-time
-//   visitors (closing it or subscribing hides it for good).
+// - As a popup for first-time visitors (not on the contact
+//   page), shown after they scroll halfway or spend 30s;
+//   closing it or subscribing hides it for good.
 // - Inline on /subscribe, a page that can be shared as a
 //   direct signup link.
 // ---------------------------------------------------
@@ -511,7 +512,12 @@ if (newsletterForm) {
 }
 
 // Welcome popup on every other page, once per visitor
-if (!subscribePage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
+// Skip the contact page so it never gets between a client and an inquiry
+const isContactPage =
+  /^\/contact(\.html)?\/?$/.test(location.pathname) ||
+  !!document.querySelector(".contact-page");
+
+if (!subscribePage && !isContactPage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
   const popup = document.createElement("div");
   popup.className = "subscribe-popup";
   popup.setAttribute("role", "dialog");
@@ -539,10 +545,24 @@ if (!subscribePage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
     if (e.key === "Escape" && popup.classList.contains("is-open")) closePopup();
   });
 
-  setTimeout(() => {
+  // Open only once the visitor has engaged with the work:
+  // scrolled about halfway down the page, or spent 30 seconds on it.
+  let opened = false;
+  let timer;
+  const openPopup = () => {
+    if (opened) return;
+    opened = true;
+    clearTimeout(timer);
+    window.removeEventListener("scroll", onScroll);
     popup.classList.add("is-open");
     document.documentElement.classList.add("subscribe-lock");
-  }, 1500);
+  };
+  const onScroll = () => {
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollable > 0 && window.scrollY / scrollable >= 0.5) openPopup();
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  timer = setTimeout(openPopup, 30000);
 }
 
 // ---------------------------------------------------
