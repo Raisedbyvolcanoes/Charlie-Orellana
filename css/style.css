@@ -2090,3 +2090,15 @@ html.subscribe-lock {
   letter-spacing: 0.08em;
   color: var(--fg-muted);
 }
+
+/* Homepage intro: a single editorial statement under the hero */
+.intro-statement {
+  max-width: 46ch;
+  margin: 0 auto;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.35rem, 2.3vw, 1.95rem);
+  line-height: 1.5;
+  color: var(--fg);
+  text-wrap: pretty;
+}
