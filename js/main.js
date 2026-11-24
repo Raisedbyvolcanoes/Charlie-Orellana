@@ -435,49 +435,114 @@ if (newsletterForm) {
 }
 
 // ---------------------------------------------------
-// Newsletter popup (contact page): appears a few
-// seconds after the page loads, and remembers that it
-// was shown so it doesn't nag the visitor again.
+// Subscribe card: one design used two ways.
+// - As a welcome popup on every page for first-time
+//   visitors (closing it or subscribing hides it for good).
+// - Inline on /subscribe, a page that can be shared as a
+//   direct signup link.
 // ---------------------------------------------------
 
-const newsletterPopup = document.getElementById("newsletter-popup");
+const SUBSCRIBE_SEEN_KEY = "rbv-newsletter-popup-seen";
+const MC_ACTION =
+  "https://raisedbyvolcanoes.us4.list-manage.com/subscribe/post?u=b26f34a80b093fe6d3d959c5a&id=67153aa003&f_id=0040a7e2f0";
 
-if (newsletterPopup) {
-  const POPUP_SEEN_KEY = "rbv-newsletter-popup-seen";
-  const popupForm = document.getElementById("mc-popup-subscribe-form");
+const storage = {
+  get(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) { /* ignore */ }
+  },
+};
 
-  const dismissPopup = () => {
-    newsletterPopup.classList.remove("is-open");
-    localStorage.setItem(POPUP_SEEN_KEY, "1");
+function buildSubscribeCard({ closable, headingId }) {
+  const card = document.createElement("div");
+  card.className = "subscribe-card";
+  card.innerHTML = `
+    ${closable ? `<button type="button" class="subscribe-close" aria-label="Close">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>` : ""}
+    <div class="subscribe-photo">
+      <img src="about.jpg" alt="Charlie Orellana with his camera" width="1440" height="1800" />
+    </div>
+    <svg class="subscribe-curve" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M5,0 C2,25 10,40 40,55 C70,68 85,80 93,100 L100,100 L100,0 Z" fill="#000" />
+    </svg>
+    <div class="subscribe-content">
+      <img class="subscribe-logo" src="Raised%20By%20Volcanoes%20logo_white%20-%20Copy.png" alt="Raised by Volcanoes" width="1530" height="510" />
+      <h2 class="subscribe-heading" id="${headingId}">Stay Connected</h2>
+      <p class="subscribe-sub">New films, photography and fine art prints, straight to your inbox.</p>
+      <form class="subscribe-form" action="${MC_ACTION}" method="post" target="${headingId}-frame">
+        <label class="sr-only" for="${headingId}-email">Email address</label>
+        <input type="email" name="EMAIL" id="${headingId}-email" placeholder="Your email address" required autocomplete="email" />
+        <div class="newsletter-honeypot" aria-hidden="true">
+          <input type="text" name="b_b26f34a80b093fe6d3d959c5a_67153aa003" tabindex="-1" value="" />
+        </div>
+        <button type="submit" class="subscribe-submit">Subscribe</button>
+        <p class="subscribe-note">No spam. Unsubscribe anytime.</p>
+      </form>
+      <p class="subscribe-success" role="status">Thank you, you're on the list.</p>
+      <iframe name="${headingId}-frame" class="newsletter-frame" title="Newsletter signup response"></iframe>
+    </div>`;
+
+  const form = card.querySelector(".subscribe-form");
+  form.addEventListener("submit", () => {
+    if (!form.checkValidity()) return;
+    storage.set(SUBSCRIBE_SEEN_KEY, "1");
+    setTimeout(() => card.classList.add("is-subscribed"), 800);
+  });
+
+  return card;
+}
+
+// Inline version on the shareable /subscribe page
+const subscribePage = document.getElementById("subscribe-page");
+if (subscribePage) {
+  subscribePage.appendChild(
+    buildSubscribeCard({ closable: false, headingId: "subscribe-page-heading" })
+  );
+}
+
+// Subscribing through the regular footer form also counts
+if (newsletterForm) {
+  newsletterForm.addEventListener("submit", () => {
+    if (newsletterForm.checkValidity()) storage.set(SUBSCRIBE_SEEN_KEY, "1");
+  });
+}
+
+// Welcome popup on every other page, once per visitor
+if (!subscribePage && !storage.get(SUBSCRIBE_SEEN_KEY)) {
+  const popup = document.createElement("div");
+  popup.className = "subscribe-popup";
+  popup.setAttribute("role", "dialog");
+  popup.setAttribute("aria-modal", "true");
+  popup.setAttribute("aria-labelledby", "subscribe-popup-heading");
+
+  const backdrop = document.createElement("div");
+  backdrop.className = "subscribe-backdrop";
+  popup.appendChild(backdrop);
+
+  const card = buildSubscribeCard({ closable: true, headingId: "subscribe-popup-heading" });
+  popup.appendChild(card);
+  document.body.appendChild(popup);
+
+  const closePopup = () => {
+    popup.classList.remove("is-open");
+    document.documentElement.classList.remove("subscribe-lock");
+    storage.set(SUBSCRIBE_SEEN_KEY, "1");
+    setTimeout(() => popup.remove(), 400);
   };
 
-  if (!localStorage.getItem(POPUP_SEEN_KEY)) {
-    setTimeout(() => {
-      newsletterPopup.classList.add("is-open");
-    }, 4000);
-  }
-
-  newsletterPopup.querySelectorAll("[data-popup-dismiss]").forEach((el) => {
-    el.addEventListener("click", dismissPopup);
-  });
-
+  backdrop.addEventListener("click", closePopup);
+  card.querySelector(".subscribe-close").addEventListener("click", closePopup);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && newsletterPopup.classList.contains("is-open")) {
-      dismissPopup();
-    }
+    if (e.key === "Escape" && popup.classList.contains("is-open")) closePopup();
   });
 
-  if (popupForm) {
-    popupForm.addEventListener("submit", () => {
-      if (!popupForm.checkValidity()) return;
-
-      localStorage.setItem(POPUP_SEEN_KEY, "1");
-
-      setTimeout(() => {
-        newsletterPopup.classList.add("is-subscribed");
-      }, 800);
-    });
-  }
+  setTimeout(() => {
+    popup.classList.add("is-open");
+    document.documentElement.classList.add("subscribe-lock");
+  }, 1500);
 }
 
 // ---------------------------------------------------
